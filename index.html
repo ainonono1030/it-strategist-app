@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ITストラテジスト 試験対策アプリ</title>
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-light: #dbeafe;
+    --primary-dark: #1d4ed8;
+    --accent: #7c3aed;
+    --success: #059669;
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --shadow: 0 1px 3px rgba(0,0,0,0.1);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%);
+    color: white;
+    padding: 20px 16px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+
+  .header-title {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+    opacity: 0.95;
+  }
+
+  .tab-nav {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2px;
+  }
+  .tab-nav::-webkit-scrollbar { display: none; }
+
+  .tab-btn {
+    flex-shrink: 0;
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    background: rgba(255,255,255,0.2);
+    color: white;
+  }
+  .tab-btn.active {
+    background: white;
+    color: #1e40af;
+  }
+  .tab-btn:active { transform: scale(0.97); }
+
+  .main {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+
+  .search-box {
+    position: relative;
+    margin-bottom: 16px;
+  }
+  .search-box input {
+    width: 100%;
+    padding: 12px 16px 12px 44px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 15px;
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-box input:focus { border-color: var(--primary); }
+  .search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 18px;
+  }
+
+  .stats-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding: 0 2px;
+  }
+  .stats-count {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .stats-count span { color: var(--primary); font-weight: 700; }
+
+  .phrase-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .phrase-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 14px 14px 12px;
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.2s, transform 0.1s;
+    position: relative;
+  }
+  .phrase-card:active { transform: scale(0.99); }
+
+  .phrase-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .phrase-category-tag {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    flex-shrink: 0;
+  }
+
+  .phrase-text {
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--text);
+  }
+
+  .phrase-tip {
+    margin-top: 8px;
+    padding: 8px 10px;
+    background: #f0f9ff;
+    border-left: 3px solid var(--primary);
+    border-radius: 0 6px 6px 0;
+    font-size: 12px;
+    color: #0369a1;
+    line-height: 1.5;
+  }
+
+  .phrase-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+  }
+
+  .phrase-source {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  .copy-btn {
+    padding: 5px 12px;
+    background: var(--primary-light);
+    color: var(--primary);
+    border: none;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .copy-btn:active { transform: scale(0.95); }
+  .copy-btn.copied {
+    background: #d1fae5;
+    color: var(--success);
+  }
+
+  .cat-0 { background: #dbeafe; color: #1d4ed8; }
+  .cat-1 { background: #ede9fe; color: #6d28d9; }
+  .cat-2 { background: #fef3c7; color: #b45309; }
+  .cat-3 { background: #fce7f3; color: #be185d; }
+  .cat-4 { background: #d1fae5; color: #065f46; }
+  .cat-5 { background: #fee2e2; color: #b91c1c; }
+  .cat-6 { background: #f0fdf4; color: #15803d; }
+
+  .category-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 16px 0 10px;
+    padding: 0 2px;
+  }
+  .category-header h2 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .category-count {
+    font-size: 12px;
+    color: var(--text-muted);
+    background: var(--border);
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+  .category-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+  }
+  .empty-state .emoji { font-size: 48px; margin-bottom: 12px; }
+  .empty-state p { font-size: 15px; }
+
+  .scroll-top {
+    position: fixed;
+    bottom: 24px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(37,99,235,0.4);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+  }
+  .scroll-top.visible { display: flex; }
+
+  mark {
+    background: #fef08a;
+    color: inherit;
+    border-radius: 2px;
+    padding: 0 1px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-title">📝 ITストラテジスト 論文フレーズ集</div>
+  <nav class="tab-nav">
+    <button class="tab-btn active" onclick="filterCategory('all')">すべて</button>
+    <button class="tab-btn" onclick="filterCategory('事業特性・課題定義')">事業特性</button>
+    <button class="tab-btn" onclick="filterCategory('DX・戦略宣言')">DX・戦略</button>
+    <button class="tab-btn" onclick="filterCategory('分析・真因特定')">分析</button>
+    <button class="tab-btn" onclick="filterCategory('ステークホルダー調整')">調整</button>
+    <button class="tab-btn" onclick="filterCategory('対応方針・段階導入')">方針</button>
+    <button class="tab-btn" onclick="filterCategory('経営視点・投資効果')">経営</button>
+    <button class="tab-btn" onclick="filterCategory('採点者に刺さる定型表現')">定型句</button>
+  </nav>
+</div>
+
+<div class="main">
+  <div class="search-box">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="searchInput" placeholder="フレーズを検索…" oninput="filterPhrases()" autocomplete="off">
+  </div>
+
+  <div class="stats-bar">
+    <div class="stats-count">
+      <span id="shownCount">0</span> / <span id="totalCount">0</span> フレーズを表示中
+    </div>
+  </div>
+
+  <div class="phrase-list" id="phraseList"></div>
+
+  <div class="empty-state" id="emptyState" style="display:none;">
+    <div class="emoji">🔎</div>
+    <p>該当するフレーズが見つかりませんでした</p>
+  </div>
+</div>
+
+<button class="scroll-top" id="scrollTopBtn" onclick="scrollToTop()">↑</button>
+
+<script>
+const CATEGORIES = [
+  '事業特性・課題定義',
+  'DX・戦略宣言',
+  '分析・真因特定',
+  'ステークホルダー調整',
+  '対応方針・段階導入',
+  '経営視点・投資効果',
+  '採点者に刺さる定型表現'
+];
+
+const phrases = [
+  { cat: '事業特性・課題定義', text: '人的対応に依存し、対応可能顧客数が売上の上限という事業構造の特性を持ってしまっていると言える。', tip: '事業特性の定義として冒頭に必ず入れる。「構造的課題」という言葉が採点者に刺さる。', source: '2015〜2025年 各論文 共通' },
+  { cat: '事業特性・課題定義', text: '来店×人的対応を前提としたビジネスモデルであり、店舗の対応可能顧客数が売上の上限となる構造的課題を抱えていた。', tip: '「来店×人的対応」という図式を一文で表現できると第1章が締まる。', source: '2023年 問1（B+評価）' },
+  { cat: '事業特性・課題定義', text: '既存施策（来店予約システム）は部分最適に留まり、対応可能顧客数が売上の上限という構造的課題の解決には至らなかった。', tip: '過去の失敗施策を「部分最適」と位置づけることで、DX提案の必然性を際立たせる。', source: '2024年 問2（A-評価）' },
+  { cat: '事業特性・課題定義', text: '待ち時間の長時間化や対応できない顧客が発生し、顧客満足度の低下が顕在化している。この状況が継続すれば事業継続にも影響しかねない。', tip: '「顕在化」「事業継続」という語で経営課題としての重要性を強調できる。', source: '2022年 問1' },
+  { cat: '事業特性・課題定義', text: '人的対応に依存した業務構造のままでは、今後の店舗拡大や売上成長にも限界があることから、販売プロセスそのものの変革が経営課題として顕在化していた。', tip: '現状維持の限界を「中長期目線」で語ることで経営視点が出る。', source: '2025年 問2（A-相当）' },
+  { cat: '事業特性・課題定義', text: '会員顧客の約20%が対応工数不足を理由に離脱しており、売上棄損額は全店舗合計で約1億円に及ぶと推計している。', tip: '課題を数値で示すことで経営層への説得力が格段に増す。', source: '2022年 問1 / 2017年 問1' },
+  { cat: '事業特性・課題定義', text: '来店後に集中している製品提案・購入手続のプロセスを来店前後に分散させることで、人的リソースをより付加価値の高い業務に注力させる。', tip: '「来店前後への分散」は構造転換を表す核心的な表現。各章で繰り返し使える。', source: '2019〜2025年 各論文' },
+  { cat: '事業特性・課題定義', text: 'A社事業は①顧客の知識格差が大きい、②提案品質が満足度を左右する、③来店キャパシティが売上制約になる、という特性を持つ。', tip: '事業特性を箇条書き的に定義すると、後段の分析・提案が「必然」に見える。', source: '2023年 問1 添削コメント' },
+
+  { cat: 'DX・戦略宣言', text: 'ITを活用した単なる業務効率化ではなく、A社の事業構造を変革するDX戦略である。', tip: '最も重要なDX宣言フレーズ。第1章・第2章・第3章のどこかに必ず入れること。', source: '2021〜2025年 各論文 共通' },
+  { cat: 'DX・戦略宣言', text: '本施策は、IT導入による業務改善ではなく、事業成長の前提条件を変える構造転換である。', tip: '採点者が最も「分かってる」と感じる一文。どのテーマにも応用できる。', source: '2022年 問1 添削コメント' },
+  { cat: 'DX・戦略宣言', text: '人的対応や店舗数に依存せず売上拡大を実現する事業構造へ変革するDX戦略である。', tip: '「人的対応・店舗数に依存しない」という変革の方向性が一目でわかる表現。', source: '2023年 問1 / 2025年 問2' },
+  { cat: 'DX・戦略宣言', text: '本ECサイトは単なる販売チャネルの追加ではなく、来店前意思決定を促進することで店舗作業の標準化と処理能力向上を実現し、収益構造を拡張する戦略的IT投資である。', tip: '「戦略的IT投資」というキーワードは採点者に強く刺さる。', source: '2023年 問1 添削コメント' },
+  { cat: 'DX・戦略宣言', text: '本モデルでは、従来の「来店後に価値を提供するモデル」から、「来店前に意思決定価値を提供し、来店時は作業価値に特化するモデル」へと転換している。', tip: 'ビジネスモデルの転換前後を対比させると採点者が「価値提供の変化」を明確に読み取れる。', source: '2024年 問2 添削コメント' },
+  { cat: 'DX・戦略宣言', text: '業務効率化に留まらず、競争優位の源泉を再定義する取り組みとして位置づけた。', tip: '「競争優位の再定義」はストラテジスト答案の核心ワード。', source: '2021年 問2 添削コメント' },
+  { cat: 'DX・戦略宣言', text: 'ITにより、従来は店舗スタッフの暗黙知に依存していた製品提案プロセスを形式知化・デジタル化し、時間・場所の制約を受けずに提供可能とした点が新たに実現したことである。', tip: '「暗黙知→形式知」という転換でITならではの価値を示せる。', source: '2024年 問2 添削コメント' },
+  { cat: 'DX・戦略宣言', text: '来店客数に依存する既存モデルから、ITにより販売能力を拡張し、店舗数増加に依存しない成長を実現する経営戦略の一環である。', tip: '経営戦略との整合性を示す表現。第1章の締めに使うと第2章への導線が自然になる。', source: '2017年 問1 添削コメント' },
+  { cat: 'DX・戦略宣言', text: 'OtoO型のビジネスモデルへ転換することで、製品提案や購入手続きをオンラインで完結させ、来店後はタイヤの着脱や車両メンテナンスの作業に特化した業務構造を実現する。', tip: 'OtoO（Online to Offline）という業界キーワードで具体性と専門性が出る。', source: '2018年 問2 / 2019年 問2' },
+
+  { cat: '分析・真因特定', text: '机上で確認できる分析結果だけでなく、現場の声を併せて収集することで、より現実的な分析結果となるよう工夫を行った。', tip: '「定量分析＋現場ヒアリング」の組み合わせが採点者の高評価ポイント。', source: '2023年 問1（B+評価）' },
+  { cat: '分析・真因特定', text: '利用部門は製品案内ページの改修を要望したが、分析の結果、要望の表層ではなく背後にある本質的課題を再定義した。', tip: '「要望の表層と真因の違い」の特定こそストラテジストらしさ。設問にある「改修要望の分析」で特に有効。', source: '2023年 問1 添削コメント' },
+  { cat: '分析・真因特定', text: 'サイト分析ツールによる定量分析、利用動線・ページ滞留時間の分析、そして現場ヒアリングを組み合わせることで、真因を精緻に特定した。', tip: 'データ分析の手段を具体的に挙げることで実務リアリティが増す。', source: '2023年 問1（B+評価）' },
+  { cat: '分析・真因特定', text: '購入に至るまでの時間について、平均値だけでなく中央値を確認したところ、顧客層ごとに大きな差異があることが判明した。', tip: '「中央値」の視点が入ることで分析の深さが格段に増す。採点者に刺さるポイント。', source: '2016年 問2（添削）' },
+  { cat: '分析・真因特定', text: '店舗提案と同等の価値をECで提供できているかを確認するため、意思決定に要する時間と離脱ポイントを評価指標とした。', tip: '「なぜその分析をしたか」を一言で示すと分析の目的が明確になり採点者が安心する。', source: '2023年 問1 添削コメント' },
+  { cat: '分析・真因特定', text: '来店後の再説明により店舗対応時間が想定以上に増加し、予約枠が逼迫した結果、顧客が希望日時で予約できず離脱していた。', tip: '因果関係を1ステップも飛ばさずに書くことで論理の緻密さが評価される。', source: '2023年 問1 添削コメント' },
+  { cat: '分析・真因特定', text: '過去の来店履歴データ及び店舗スタッフへのヒアリングを基に、業務プロセス毎の対応時間を可視化した。', tip: '分析手段（データ＋ヒアリング）を明示することで方法論の充実度が伝わる。', source: '2016年 問2 添削コメント' },
+  { cat: '分析・真因特定', text: '会員顧客（車両データ保有）と非会員顧客（車両データ未保有）に分けて分析することで、対応時間の幅が生じる顧客属性を特定した。', tip: '顧客を「セグメント別」に分析すると問題の核心に近づける。', source: '2016年 問2 / 2023年 問1' },
+
+  { cat: 'ステークホルダー調整', text: '複数ステークホルダーの意見調整にあたり、「冬の繁忙期までに一定の効果を出せる実現可能性」と「競争優位の源泉を自社に残すこと」を共通の判断軸とした。', tip: '意見調整の「共通の判断軸」を明示すると合意形成のプロセスが論理的に見える。', source: '2021年 問2' },
+  { cat: 'ステークホルダー調整', text: '店舗事業部門は対応品質への懸念を、経営層は変革スピードを重視していた。双方の意思を踏まえ、全社最適を実現する方針として段階導入を提案した。', tip: 'ステークホルダーの「対立軸」を整理してから解決策を示すのが鉄則。', source: '2021年 問2 / 2025年 問2' },
+  { cat: 'ステークホルダー調整', text: '部門間の利害対立を解消しつつ、全社最適を実現するDX推進体制を構築した。', tip: '「全社最適」という言葉はITストラテジスト的視点の証明になる。', source: '2025年 問2（A-相当）' },
+  { cat: 'ステークホルダー調整', text: '在庫については全店舗在庫を仮想的に一元管理し、EC受注時に最適な拠点から引き当てる方式とした。また、売上はEC売上として本部で集約管理し、店舗評価については新たな指標を導入することで、現場の不利益が生じないよう配慮した。', tip: '在庫・評価制度まで踏み込んだ記述は第3章の深みとして高く評価される。', source: '2025年 問2' },
+  { cat: 'ステークホルダー調整', text: '競争優位である製品提案ロジックに関してのみスクラッチ開発し、その他サイトに関する部分はパッケージシステムを活用することで、スピードと競争優位保護を両立する方針として調整した。', tip: 'ベンダーとの意見調整では「スクラッチ vs パッケージ」の切り分けが有効な論点。', source: '2021年 問2' },
+  { cat: 'ステークホルダー調整', text: '経営層の懸念（投資回収リスク）と事業部門の意向（現場負担増の回避）を踏まえ、段階的導入とKPI連動の評価体制を組み合わせた対応策を提案した。', tip: '経営層と事業部門の懸念を分けて整理してから解決策を示すと論理が整う。', source: '2025年 問2 / 2024年 問2' },
+
+  { cat: '対応方針・段階導入', text: '初期段階はECサイト上での製品選択を推奨しつつ、店舗での製品提案を前提とした予約も受け付けるハイブリッド型とし、AIの精度が担保され次第、段階的にECサイト中心の運用へ移行する。', tip: '段階導入の具体的な移行条件を明示することで実現可能性が高い提案に見える。', source: '2018〜2025年 各論文 共通' },
+  { cat: '対応方針・段階導入', text: '段階的に導入を進めることで、顧客満足度の低下・投資回収リスク・ブランド毀損の各リスクを防止する。', tip: 'リスクを3点セットで示すと経営的な視点が伝わる。', source: '2019年 問2 / 2022年 問1' },
+  { cat: '対応方針・段階導入', text: 'ECサイト経由購入顧客率及び店舗でのヒアリング内容を指標とし、過半数の顧客がECサイト経由で問題なく購入できていることが明らかになり次第、第2フェーズへ移行するとした。', tip: 'フェーズ移行の「判断基準」を数値で明示すると経営判断の妥当性が伝わる。', source: '2024年 問2（A-評価）' },
+  { cat: '対応方針・段階導入', text: '短期的には予約枠最適化による運用改善を実施し、中期的にはAI提案の信頼性向上、長期的には来店前購買完結率向上による店舗作業の標準化を実現する。', tip: '短期・中期・長期の3段階で示すと経営戦略としての体裁が整う。', source: '2023年 問1 添削コメント' },
+  { cat: '対応方針・段階導入', text: 'データが蓄積し精度の向上が担保された状態を確認でき次第、段階的にAI中心の運用へ移行する計画とした。', tip: '移行判断を「データ蓄積・精度担保」という客観的な条件に紐づけることで説得力が増す。', source: '2018年 問2 / 2019年 問2' },
+  { cat: '対応方針・段階導入', text: '来店予約システムの先行リリースは、対応可能工数が変わらない状態で予約枠の不足による顧客ストレスを新たに生むため適切でないと判断した。ECサイトと同時にリリースするスケジュールとした。', tip: '優先順位の「根拠」を顧客満足度の観点で論じることでITストラテジストらしさが出る。', source: '2015年 問2' },
+  { cat: '対応方針・段階導入', text: 'ECサイトの改修として、AI提案結果に対し店舗相談を前提とした予約導線を追加し、提案の不確実性を業務プロセスで補完する設計とした。', tip: '「改修要望への回答」として何を改修するかを明示することが第3章では必須。', source: '2023年 問1 添削コメント' },
+
+  { cat: '経営視点・投資効果', text: 'KPI達成を次フェーズ移行の判断基準とし、段階的に投資を行う方針とした。これにより、投資リスクを抑制しつつ、DXによる事業構造変革を着実に推進する意思決定がなされた。', tip: 'KPIを移行判断基準に使うことで「経営としてどう腹をくくったか」が伝わる。', source: '2025年 問2（A-相当）' },
+  { cat: '経営視点・投資効果', text: '顧客数増加及び客単価増加（アップセル）により、店舗スタッフ1人あたり月20万円の売上向上、A社全体では年間1億円の売上向上が目指せる試算を提示した。', tip: '個人単位と全社単位の両方で数字を示すことで経営インパクトが具体的になる。', source: '2016年 問2 / 2017年 問1' },
+  { cat: '経営視点・投資効果', text: 'これらKPIを用い、売上増加額と人件費効率化効果を金額換算し、初期投資額に対する投資回収期間を3年以内とすることを目標とした。', tip: '「投資回収期間」を示すことが2017年問1（投資効果）の設問では特に重要。', source: '2017年 問1 添削コメント' },
+  { cat: '経営視点・投資効果', text: '店舗の評価指標にECサイト活用に関するKPIを追加し、顧客への利用促進を店舗業務の一部として位置付けた。KPIとしてECサイト経由の購入率および対応可能顧客数の増加率を設定した。', tip: '店舗KPIにECを組み込む施策は「組織と戦略の連動」として採点者に好評。', source: '2025年 問2 / 2021年 問2' },
+  { cat: '経営視点・投資効果', text: '当施策が短期的な業務効率化に留まらず、中長期的に売上成長の上限を引き上げる事業構造転換である点を、経営層に対して強調して説明した。', tip: '「経営層 × 中長期 × 構造転換」の三点セットで説明すると説得力が高まる。', source: '2022年 問1 添削コメント' },
+  { cat: '経営視点・投資効果', text: '段階導入とすることで、初期投資を抑えつつ効果検証を行い、投資判断の妥当性を経営層が継続的に評価できるようにした。', tip: '「ITストラテジスト視点」が一段強まる一文。第3章の締めに最適。', source: '2017年 問1 添削コメント' },
+  { cat: '経営視点・投資効果', text: 'EC経由購入比率、来店当たりの対応時間、アップセル率をKPIとして設定し、業務効率と売上への影響を定量的に検証する。', tip: 'KPIは「効率系」と「売上系」の両方を示すと経営的バランスが取れている。', source: '2018年 問2 添削コメント' },
+  { cat: '経営視点・投資効果', text: '経営層の懸念（投資回収リスク）に対し、条件付き投資・段階移行・投資撤退ラインを明示することで、経営としての腹のくくり方を示した。', tip: '経営層を「条件付き判断」に導く記述がA評価に届く差となる。', source: '2025年 問2 添削コメント' },
+
+  { cat: '採点者に刺さる定型表現', text: 'ITを活用した単なる業務効率化ではなく、A社の事業構造を変革するDX戦略である。', tip: '頻出中の頻出。どの年度・どの設問でも使える万能フレーズ。', source: '全年度 共通' },
+  { cat: '採点者に刺さる定型表現', text: '本施策は、IT導入による業務改善ではなく、事業成長の前提条件を変える構造転換である。', tip: '覚えて即座に書けるようにする。これ一文で「分かってる答案」に格上げできる。', source: '2022年 問1 添削' },
+  { cat: '採点者に刺さる定型表現', text: '戦略的IT投資として位置づけることで、単なるコスト削減ではなく事業成長の基盤構築であることを経営層に説明した。', tip: '「戦略的IT投資」は採点者が聞きたい言葉の筆頭。', source: '2023年 問1 添削' },
+  { cat: '採点者に刺さる定型表現', text: '構造的課題を特定し、ITを活用した事業構造変革を提案することで、全体最適の実現を目指した。', tip: '「構造的課題」「事業構造変革」「全体最適」の三語がすべて入った最強テンプレ。', source: '複数年度 共通' },
+  { cat: '採点者に刺さる定型表現', text: '本ECサイトは単なる販売チャネルの追加ではなく、来店前意思決定を促進することで店舗作業の標準化と処理能力向上を実現し、収益構造を拡張する戦略的IT投資である。', tip: '第2章の冒頭か末尾に入れると「ストラテジスト答案の完成形」と評価される。', source: '2023年 問1 添削コメント' },
+  { cat: '採点者に刺さる定型表現', text: '人的リソースが売上の上限となっていた事業構造を転換する。', tip: '短くて力強い。どこにでも挿入できる汎用フレーズ。', source: '添削コメント 各年度' },
+  { cat: '採点者に刺さる定型表現', text: '経営層の意思決定を支援するため、リスクと対応策を明示した上で段階導入を提案した。', tip: '「経営層の意思決定を支援」という主語がITストラテジストらしさを示す。', source: '2019年 問2 添削コメント' },
+  { cat: '採点者に刺さる定型表現', text: 'DXとしての構造変革は「EC化した」という事実ではなく、「価値提供・収益構造が変わった」という変化で評価される。', tip: '自分が書く前に確認するチェックポイントとして活用できるメタフレーズ。', source: '2024年 問2 添削コメント' }
+];
+
+let currentCategory = 'all';
+let currentSearch = '';
+
+function renderPhrases() {
+  const list = document.getElementById('phraseList');
+  const empty = document.getElementById('emptyState');
+  const shownCount = document.getElementById('shownCount');
+  const totalCount = document.getElementById('totalCount');
+
+  const search = currentSearch.toLowerCase();
+  const filtered = phrases.filter(p => {
+    const matchCat = currentCategory === 'all' || p.cat === currentCategory;
+    const matchSearch = !search ||
+      p.text.toLowerCase().includes(search) ||
+      p.tip.toLowerCase().includes(search) ||
+      p.source.toLowerCase().includes(search);
+    return matchCat && matchSearch;
+  });
+
+  totalCount.textContent = phrases.length;
+  shownCount.textContent = filtered.length;
+
+  if (filtered.length === 0) {
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  if (currentCategory !== 'all' || search) {
+    list.innerHTML = filtered.map(p => renderCard(p, search)).join('');
+  } else {
+    let html = '';
+    CATEGORIES.forEach(cat => {
+      const catPhrases = filtered.filter(p => p.cat === cat);
+      if (catPhrases.length === 0) return;
+      html += `<div class="category-header"><h2>${cat}</h2><span class="category-count">${catPhrases.length}件</span><div class="category-line"></div></div>`;
+      html += catPhrases.map(p => renderCard(p, search)).join('');
+    });
+    list.innerHTML = html;
+  }
+}
+
+function renderCard(p, search) {
+  const catIdx = CATEGORIES.indexOf(p.cat);
+  const displayText = search ? highlight(p.text, search) : escHtml(p.text);
+  const displayTip = search ? highlight(p.tip, search) : escHtml(p.tip);
+  return `<div class="phrase-card"><div class="phrase-card-header"><span class="phrase-category-tag cat-${catIdx}">${p.cat}</span></div><div class="phrase-text">${displayText}</div><div class="phrase-tip">💡 ${displayTip}</div><div class="phrase-footer"><span class="phrase-source">出典：${escHtml(p.source)}</span><button class="copy-btn" onclick="copyPhrase(this, '${escAttr(p.text)}')">コピー</button></div></div>`;
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttr(str) {
+  return str.replace(/'/g, "\\'").replace(/\n/g, ' ');
+}
+function highlight(text, search) {
+  const escaped = escHtml(text);
+  const re = new RegExp(escHtml(search).replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'gi');
+  return escaped.replace(re, m => `<mark>${m}</mark>`);
+}
+
+function filterCategory(cat) {
+  currentCategory = cat;
+  document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+    const cats = ['all', ...CATEGORIES];
+    btn.classList.toggle('active', cats[i] === cat);
+  });
+  renderPhrases();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function filterPhrases() {
+  currentSearch = document.getElementById('searchInput').value;
+  renderPhrases();
+}
+
+function copyPhrase(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ コピー済';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'コピー'; btn.classList.remove('copied'); }, 1800);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = '✓ コピー済';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'コピー'; btn.classList.remove('copied'); }, 1800);
+  });
+}
+
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+window.addEventListener('scroll', () => {
+  document.getElementById('scrollTopBtn').classList.toggle('visible', window.scrollY > 400);
+});
+
+renderPhrases();
+</script>
+</body>
+</html>
