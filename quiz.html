@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ITストラテジスト 午前Ⅱ 問題集</title>
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-light: #dbeafe;
+    --accent: #7c3aed;
+    --success: #059669;
+    --success-light: #d1fae5;
+    --danger: #dc2626;
+    --danger-light: #fee2e2;
+    --warning: #d97706;
+    --warning-light: #fef3c7;
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --shadow: 0 1px 3px rgba(0,0,0,0.1);
+    --radius: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ===== HEADER ===== */
+  .header {
+    background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%);
+    color: white;
+    padding: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .header-title { font-size: 15px; font-weight: 700; }
+  .header-nav {
+    display: flex;
+    gap: 6px;
+  }
+  .nav-link {
+    padding: 4px 10px;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border-radius: 12px;
+    font-size: 12px;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .nav-link.active { background: white; color: #1e40af; }
+
+  /* モード切替 */
+  .mode-tabs {
+    display: flex;
+    gap: 6px;
+  }
+  .mode-tab {
+    flex: 1;
+    padding: 7px;
+    border: none;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    transition: all 0.2s;
+  }
+  .mode-tab.active { background: white; color: #1e40af; }
+
+  /* ===== MAIN ===== */
+  .main {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+
+  /* ===== STATS CARD ===== */
+  .stats-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+    margin-bottom: 14px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .stat-item {
+    flex: 1;
+    text-align: center;
+  }
+  .stat-num {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--primary);
+    line-height: 1;
+  }
+  .stat-label { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+  .stat-divider { width: 1px; background: var(--border); align-self: stretch; }
+
+  /* ===== PROGRESS BAR ===== */
+  .progress-wrap {
+    margin-bottom: 14px;
+  }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+  }
+  .progress-bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #2563eb, #7c3aed);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+
+  /* ===== SUBJECT BADGE ===== */
+  .subject-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--primary-light);
+    color: var(--primary);
+    margin-bottom: 10px;
+  }
+
+  /* ===== QUESTION CARD ===== */
+  .question-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 18px 16px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+  }
+  .question-num {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .question-text {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* ===== CHOICES ===== */
+  .choices { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+
+  .choice-btn {
+    width: 100%;
+    padding: 13px 14px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.5;
+  }
+  .choice-btn:active:not(:disabled) { transform: scale(0.98); }
+  .choice-btn:disabled { cursor: default; }
+
+  .choice-label {
+    font-weight: 800;
+    font-size: 13px;
+    flex-shrink: 0;
+    width: 18px;
+  }
+
+  .choice-btn.correct {
+    border-color: var(--success);
+    background: var(--success-light);
+    color: #065f46;
+  }
+  .choice-btn.wrong {
+    border-color: var(--danger);
+    background: var(--danger-light);
+    color: #7f1d1d;
+  }
+  .choice-btn.highlight {
+    border-color: var(--success);
+    background: var(--success-light);
+  }
+
+  /* ===== RESULT PANEL ===== */
+  .result-panel {
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    display: none;
+  }
+  .result-panel.correct {
+    background: var(--success-light);
+    border: 1px solid #6ee7b7;
+  }
+  .result-panel.wrong {
+    background: var(--danger-light);
+    border: 1px solid #fca5a5;
+  }
+  .result-header {
+    font-size: 16px;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+  .result-panel.correct .result-header { color: var(--success); }
+  .result-panel.wrong .result-header { color: var(--danger); }
+  .result-panel.correct .result-header::before { content: '✓ '; }
+  .result-panel.wrong .result-header::before { content: '✗ '; }
+
+  .explanation {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text);
+    margin-top: 6px;
+  }
+
+  /* ===== BUTTONS ===== */
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    margin-top: 8px;
+  }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-primary:disabled { opacity: 0.4; cursor: default; }
+
+  .btn-secondary {
+    width: 100%;
+    padding: 12px;
+    background: var(--surface);
+    color: var(--primary);
+    border: 2px solid var(--primary);
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+  }
+  .btn-secondary:active { transform: scale(0.98); }
+
+  /* ===== FINAL RESULT ===== */
+  .final-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 28px 20px;
+    text-align: center;
+    box-shadow: var(--shadow);
+  }
+  .final-score {
+    font-size: 56px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
+  }
+  .final-label { font-size: 15px; color: var(--text-muted); margin: 8px 0 20px; }
+  .final-msg { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+  .final-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+  .final-breakdown {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .breakdown-item {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+  }
+  .breakdown-item.correct-bg { background: var(--success-light); }
+  .breakdown-item.wrong-bg { background: var(--danger-light); }
+  .breakdown-num { font-size: 24px; font-weight: 800; }
+  .breakdown-item.correct-bg .breakdown-num { color: var(--success); }
+  .breakdown-item.wrong-bg .breakdown-num { color: var(--danger); }
+  .breakdown-label { font-size: 11px; color: var(--text-muted); }
+
+  /* ===== 苦手問題リスト ===== */
+  .weak-list { display: flex; flex-direction: column; gap: 10px; }
+  .weak-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 14px;
+    box-shadow: var(--shadow);
+  }
+  .weak-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .weak-miss {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--danger);
+    background: var(--danger-light);
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+  .weak-q { font-size: 14px; line-height: 1.5; color: var(--text); }
+
+  /* ===== EMPTY STATE ===== */
+  .empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--text-muted);
+  }
+  .empty-state .emoji { font-size: 44px; margin-bottom: 10px; }
+  .empty-state p { font-size: 14px; line-height: 1.7; }
+
+  /* ===== SECTION HIDDEN ===== */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ===== 科目タグ色 ===== */
+  .sub-strategy { background: #dbeafe; color: #1d4ed8; }
+  .sub-management { background: #ede9fe; color: #6d28d9; }
+  .sub-planning { background: #d1fae5; color: #065f46; }
+  .sub-tech { background: #fef3c7; color: #b45309; }
+  .sub-law { background: #fce7f3; color: #be185d; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="header-title">🧠 ITストラテジスト 午前Ⅱ</div>
+    <div class="header-nav">
+      <a href="index.html" class="nav-link">📝 フレーズ集</a>
+      <a href="quiz.html" class="nav-link active">🧠 問題集</a>
+    </div>
+  </div>
+  <div class="mode-tabs">
+    <button class="mode-tab active" onclick="showSection('quiz')">📋 問題を解く</button>
+    <button class="mode-tab" onclick="showSection('weak')">⚠️ 苦手問題</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ===== 問題を解くセクション ===== -->
+  <div id="section-quiz" class="section active">
+
+    <!-- スタート画面 -->
+    <div id="start-screen">
+      <div class="stats-card">
+        <div class="stat-item">
+          <div class="stat-num" id="total-count">0</div>
+          <div class="stat-label">問題数</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <div class="stat-num" id="weak-count">0</div>
+          <div class="stat-label">苦手問題</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <div class="stat-num" id="mastered-count">0</div>
+          <div class="stat-label">習得済み</div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:8px; margin-bottom:8px;">
+        <button class="btn-primary" style="margin-top:0;" onclick="startQuiz('all')">🔀 全問ランダム</button>
+      </div>
+      <button class="btn-secondary" onclick="startQuiz('weak')" id="btn-weak-start">⚠️ 苦手問題だけ</button>
+
+      <div style="margin-top:16px; padding:14px; background:var(--surface); border-radius:var(--radius); border:1px solid var(--border);">
+        <p style="font-size:13px; color:var(--text-muted); line-height:1.7;">
+          💡 <strong>問題の追加方法：</strong><br>
+          間違えた過去問をClaudeに送ると、問題・選択肢・解説をこのアプリに追加してもらえます。
+        </p>
+      </div>
+    </div>
+
+    <!-- 問題画面 -->
+    <div id="quiz-screen" style="display:none;">
+      <div class="progress-wrap">
+        <div class="progress-label">
+          <span id="q-progress">1 / 10</span>
+          <span id="q-score">正解 0問</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-num" id="q-num">問題 1</div>
+        <span class="subject-badge" id="q-subject">システム戦略</span>
+        <div class="question-text" id="q-text"></div>
+        <div class="choices" id="q-choices"></div>
+      </div>
+
+      <div class="result-panel" id="result-panel">
+        <div class="result-header" id="result-header"></div>
+        <div class="explanation" id="result-explanation"></div>
+      </div>
+
+      <button class="btn-primary" id="btn-next" style="display:none;" onclick="nextQuestion()">次の問題へ →</button>
+      <button class="btn-secondary" onclick="endQuiz()" style="margin-top:8px;">終了する</button>
+    </div>
+
+    <!-- 結果画面 -->
+    <div id="result-screen" style="display:none;">
+      <div class="final-card">
+        <div class="final-score" id="final-score">0/0</div>
+        <div class="final-label">正解数</div>
+        <div class="final-msg" id="final-msg"></div>
+        <div class="final-sub" id="final-sub"></div>
+        <div class="final-breakdown">
+          <div class="breakdown-item correct-bg">
+            <div class="breakdown-num" id="bd-correct">0</div>
+            <div class="breakdown-label">正解</div>
+          </div>
+          <div class="breakdown-item wrong-bg">
+            <div class="breakdown-num" id="bd-wrong">0</div>
+            <div class="breakdown-label">不正解</div>
+          </div>
+        </div>
+        <button class="btn-primary" style="margin-top:0;" onclick="startQuiz('all')">🔀 もう一度（全問）</button>
+        <button class="btn-secondary" onclick="startQuiz('weak')">⚠️ 苦手問題だけ</button>
+        <button class="btn-secondary" onclick="showStartScreen()" style="margin-top:8px;">← トップに戻る</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== 苦手問題セクション ===== -->
+  <div id="section-weak" class="section">
+    <div id="weak-list-wrap"></div>
+  </div>
+
+</div>
+
+<script>
+// =====================================================
+// 問題データ（ここに追加していく）
+// =====================================================
+const ALL_QUESTIONS = [
+  {
+    id: 1,
+    subject: 'システム戦略',
+    subjectClass: 'sub-strategy',
+    question: 'ITストラテジストが行う情報システム戦略の策定において、最も重要とされる活動はどれか。',
+    choices: [
+      '経営戦略と整合性のとれたIT戦略を立案する',
+      '最新のITトレンドをいち早く導入する計画を立てる',
+      'コスト削減を最優先にシステム刷新計画を作成する',
+      'ベンダーから提案された最良のシステムを採用する'
+    ],
+    answer: 0,
+    explanation: 'ITストラテジストの最重要役割は「経営戦略との整合性」を持つIT戦略の立案です。IT導入はそれ自体が目的ではなく、経営目標達成の手段です。最新技術の導入やコスト削減は手段であり、経営戦略との整合性が最優先されます。'
+  },
+  {
+    id: 2,
+    subject: '経営戦略',
+    subjectClass: 'sub-management',
+    question: 'DX（デジタルトランスフォーメーション）の本質として最も適切な説明はどれか。',
+    choices: [
+      '既存業務をデジタル化し、効率化を図ること',
+      '最新のAIやクラウドを積極的に導入すること',
+      'デジタル技術を活用して事業モデルや組織を変革し、競争上の優位性を確立すること',
+      'IT部門を強化してシステム開発スピードを向上させること'
+    ],
+    answer: 2,
+    explanation: 'DXの本質は「業務効率化」ではなく「事業モデルや組織の変革」です。経済産業省のDX推進指標でも、デジタル技術による競争優位の確立が本質とされています。単なるIT化（デジタイゼーション）とDXは明確に区別されます。'
+  },
+  {
+    id: 3,
+    subject: 'IT投資評価',
+    subjectClass: 'sub-strategy',
+    question: 'IT投資の評価方法のうち、投資によって得られる効果を貨幣価値に換算せずに評価できる手法はどれか。',
+    choices: [
+      'ROI（投資利益率）',
+      'NPV（正味現在価値）',
+      'バランスト・スコアカード（BSC）',
+      'IRR（内部収益率）'
+    ],
+    answer: 2,
+    explanation: 'バランスト・スコアカード（BSC）は、財務、顧客、内部プロセス、学習と成長の4つの視点から戦略を評価するフレームワークです。財務指標だけでなく非財務指標も含めて評価できるため、効果を貨幣価値に換算しにくいIT投資の評価に活用されます。ROI・NPV・IRRはいずれも財務的な数値で評価します。'
+  },
+  {
+    id: 4,
+    subject: 'システム企画',
+    subjectClass: 'sub-planning',
+    question: 'RFP（提案依頼書）に記載する内容として、最も適切なものはどれか。',
+    choices: [
+      'ベンダーが提案すべきシステムの詳細設計仕様',
+      '調達側が求めるシステムの要件、評価基準、契約条件などの情報',
+      'ベンダーの技術力を試すためのテスト問題',
+      '過去に導入したシステムの評価結果一覧'
+    ],
+    answer: 1,
+    explanation: 'RFP（Request for Proposal：提案依頼書）は、調達側がベンダーに対して提案を依頼するための文書です。システムに求める要件（機能・非機能）、納期、予算、評価基準、契約条件などを記載します。詳細設計はベンダーが提案する内容であり、RFPには含まれません。'
+  },
+  {
+    id: 5,
+    subject: '経営戦略',
+    subjectClass: 'sub-management',
+    question: 'バリューチェーン分析の説明として、最も適切なものはどれか。',
+    choices: [
+      '企業の財務状況を分析するためのフレームワーク',
+      '企業活動を主活動と支援活動に分解し、各活動における付加価値を分析する手法',
+      '市場における競合他社との価格競争を分析する手法',
+      '顧客の購買行動を段階的に分析するフレームワーク'
+    ],
+    answer: 1,
+    explanation: 'バリューチェーン（価値連鎖）分析はマイケル・ポーターが提唱したフレームワークです。企業活動を「主活動（購買物流・製造・出荷物流・販売マーケ・サービス）」と「支援活動（全般管理・HRM・技術開発・調達）」に分解し、どの活動で付加価値を生み出しているかを分析します。'
+  },
+  {
+    id: 6,
+    subject: 'プロジェクト管理',
+    subjectClass: 'sub-planning',
+    question: 'クリティカルパス法（CPM）に関する説明として、正しいものはどれか。',
+    choices: [
+      'プロジェクトのリスクを特定し、対応策を検討する手法',
+      'プロジェクト全体の工程の中で、余裕時間がゼロの作業経路を特定する手法',
+      'チームメンバーの作業負荷を均等化するための技法',
+      'コストと品質のトレードオフを最適化する手法'
+    ],
+    answer: 1,
+    explanation: 'クリティカルパスとは、プロジェクト開始から完了までの経路のうち、余裕時間（フロート）がゼロの作業を結んだ最長経路です。クリティカルパス上の作業が遅延すると、プロジェクト全体の完了が遅れます。ITストラテジスト試験では、クリティカルパスの計算問題が頻出です。'
+  },
+  {
+    id: 7,
+    subject: 'セキュリティ',
+    subjectClass: 'sub-tech',
+    question: 'ゼロトラストセキュリティモデルの基本的な考え方として、最も適切なものはどれか。',
+    choices: [
+      '社内ネットワーク内のアクセスはすべて信頼できると見なす',
+      '境界型セキュリティをより強固にすることでサイバー攻撃を防ぐ',
+      '場所やネットワークに関わらず、すべてのアクセスを検証・認証する',
+      'エンドポイントのウイルス対策ソフトを最優先に強化する'
+    ],
+    answer: 2,
+    explanation: 'ゼロトラストは「何も信頼しない」という考え方に基づくセキュリティモデルです。社内ネットワーク内部も含め、すべてのアクセスに対して「常に確認（Verify）、最小権限（Least Privilege）、侵害を前提（Assume Breach）」の原則で認証・認可を行います。テレワーク普及に伴い重要性が高まっています。'
+  },
+  {
+    id: 8,
+    subject: 'システム戦略',
+    subjectClass: 'sub-strategy',
+    question: 'エンタープライズアーキテクチャ（EA）の4つの体系として、正しい組合せはどれか。',
+    choices: [
+      'ビジネスアーキテクチャ、データアーキテクチャ、アプリケーションアーキテクチャ、テクノロジアーキテクチャ',
+      '組織アーキテクチャ、プロセスアーキテクチャ、システムアーキテクチャ、ネットワークアーキテクチャ',
+      '経営アーキテクチャ、業務アーキテクチャ、情報アーキテクチャ、インフラアーキテクチャ',
+      '戦略アーキテクチャ、戦術アーキテクチャ、運用アーキテクチャ、保守アーキテクチャ'
+    ],
+    answer: 0,
+    explanation: 'エンタープライズアーキテクチャ（EA）の4体系は、①ビジネスアーキテクチャ（業務・組織）、②データアーキテクチャ（情報・データ）、③アプリケーションアーキテクチャ（システム・機能）、④テクノロジアーキテクチャ（技術・インフラ）です。ZachmanフレームワークやTOGAFなどのフレームワークでも用いられます。'
+  },
+  {
+    id: 9,
+    subject: '法務・標準化',
+    subjectClass: 'sub-law',
+    question: 'GDPR（EU一般データ保護規則）に違反した場合のペナルティとして、正しいものはどれか。',
+    choices: [
+      '最大100万ユーロ、または年間売上高の1%のいずれか高い方',
+      '最大2,000万ユーロ、または年間全世界売上高の4%のいずれか高い方',
+      '最大500万ユーロの固定罰金',
+      '違反1件につき10万ユーロの罰金'
+    ],
+    answer: 1,
+    explanation: 'GDPRの最大罰則は「2,000万ユーロ、または企業の前年度全世界年間売上高の4%のいずれか高い方」です。これは特に深刻な違反（基本原則・データ主体の権利・同意等）に適用されます。軽微な違反でも「1,000万ユーロまたは売上高2%」の罰則があります。グローバルビジネスを行う企業のITストラテジストは必ず押さえる知識です。'
+  },
+  {
+    id: 10,
+    subject: 'サービスマネジメント',
+    subjectClass: 'sub-management',
+    question: 'ITIL（ITインフラストラクチャライブラリ）におけるサービスデスクの主な役割として、最も適切なものはどれか。',
+    choices: [
+      'ITシステムの設計・開発を行う',
+      'ユーザーからの問合せや障害報告を受け付け、解決または適切な窓口へ連携する単一窓口',
+      'ベンダーとの契約交渉を行う',
+      'ITサービスの予算管理を行う'
+    ],
+    answer: 1,
+    explanation: 'サービスデスクはITILにおける「シングルポイントオブコンタクト（SPOC：単一窓口）」として機能します。ユーザーからのインシデント報告・サービス要求・問合せを一元的に受け付け、解決または適切なチームへのエスカレーションを行います。ユーザーの業務継続性を支える重要な役割を担います。'
+  }
+];
+
+// =====================================================
+// 状態管理
+// =====================================================
+let currentQuestions = [];
+let currentIndex = 0;
+let correctCount = 0;
+let wrongIds = [];
+let sessionWrongIds = [];
+const STORAGE_KEY = 'its_weak_questions';
+
+function getWeakData() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; }
+}
+function saveWeakData(data) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch {}
+}
+function addWrong(id) {
+  const d = getWeakData();
+  d[id] = (d[id] || 0) + 1;
+  saveWeakData(d);
+}
+function clearWrong(id) {
+  const d = getWeakData();
+  delete d[id];
+  saveWeakData(d);
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// =====================================================
+// UI 制御
+// =====================================================
+function showSection(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('section-' + name).classList.add('active');
+  event.target.classList.add('active');
+
+  if (name === 'weak') renderWeakList();
+  if (name === 'quiz') showStartScreen();
+}
+
+function showStartScreen() {
+  document.getElementById('start-screen').style.display = 'block';
+  document.getElementById('quiz-screen').style.display = 'none';
+  document.getElementById('result-screen').style.display = 'none';
+  updateStats();
+}
+
+function updateStats() {
+  const weakData = getWeakData();
+  const weakIds = Object.keys(weakData).map(Number);
+  const weakQuestions = ALL_QUESTIONS.filter(q => weakIds.includes(q.id));
+  const masteredCount = ALL_QUESTIONS.length - weakQuestions.length;
+
+  document.getElementById('total-count').textContent = ALL_QUESTIONS.length;
+  document.getElementById('weak-count').textContent = weakQuestions.length;
+  document.getElementById('mastered-count').textContent = Math.max(0, masteredCount);
+
+  const btnWeak = document.getElementById('btn-weak-start');
+  if (weakQuestions.length === 0) {
+    btnWeak.disabled = true;
+    btnWeak.textContent = '⚠️ 苦手問題なし';
+  } else {
+    btnWeak.disabled = false;
+    btnWeak.textContent = `⚠️ 苦手問題だけ（${weakQuestions.length}問）`;
+  }
+}
+
+// =====================================================
+// クイズ制御
+// =====================================================
+function startQuiz(mode) {
+  const weakData = getWeakData();
+  const weakIds = Object.keys(weakData).map(Number);
+
+  if (mode === 'weak') {
+    currentQuestions = shuffle(ALL_QUESTIONS.filter(q => weakIds.includes(q.id)));
+    if (currentQuestions.length === 0) {
+      alert('苦手問題がまだ登録されていません！');
+      return;
+    }
+  } else {
+    currentQuestions = shuffle(ALL_QUESTIONS);
+  }
+
+  currentIndex = 0;
+  correctCount = 0;
+  sessionWrongIds = [];
+
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('result-screen').style.display = 'none';
+  document.getElementById('quiz-screen').style.display = 'block';
+
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = currentQuestions[currentIndex];
+  const total = currentQuestions.length;
+
+  // プログレス
+  document.getElementById('q-progress').textContent = `${currentIndex + 1} / ${total}`;
+  document.getElementById('q-score').textContent = `正解 ${correctCount}問`;
+  document.getElementById('progress-fill').style.width = `${(currentIndex / total) * 100}%`;
+
+  // 問題
+  document.getElementById('q-num').textContent = `問題 ${currentIndex + 1}`;
+  document.getElementById('q-subject').textContent = q.subject;
+  document.getElementById('q-subject').className = `subject-badge ${q.subjectClass}`;
+  document.getElementById('q-text').textContent = q.question;
+
+  // 選択肢（順序もシャッフル）
+  const labels = ['ア', 'イ', 'ウ', 'エ'];
+  const choicesEl = document.getElementById('q-choices');
+  choicesEl.innerHTML = '';
+
+  // 選択肢をシャッフル（正解インデックスも追跡）
+  const indexed = q.choices.map((c, i) => ({ text: c, orig: i }));
+  const shuffled = shuffle(indexed);
+
+  shuffled.forEach((item, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.innerHTML = `<span class="choice-label">${labels[i]}</span><span>${item.text}</span>`;
+    btn.dataset.origIdx = item.orig;
+    btn.addEventListener('click', () => selectAnswer(btn, item.orig === q.answer, q));
+    choicesEl.appendChild(btn);
+  });
+
+  // 結果パネル・次へボタンをリセット
+  const rp = document.getElementById('result-panel');
+  rp.style.display = 'none';
+  rp.className = 'result-panel';
+  document.getElementById('btn-next').style.display = 'none';
+}
+
+function selectAnswer(clickedBtn, isCorrect, q) {
+  // すべてのボタンを無効化
+  document.querySelectorAll('.choice-btn').forEach(btn => {
+    btn.disabled = true;
+    const origIdx = parseInt(btn.dataset.origIdx);
+    if (origIdx === q.answer) btn.classList.add('highlight');
+  });
+
+  const rp = document.getElementById('result-panel');
+  rp.style.display = 'block';
+
+  if (isCorrect) {
+    clickedBtn.classList.add('correct');
+    rp.className = 'result-panel correct';
+    document.getElementById('result-header').textContent = '正解！';
+    correctCount++;
+    clearWrong(q.id);
+  } else {
+    clickedBtn.classList.add('wrong');
+    rp.className = 'result-panel wrong';
+    document.getElementById('result-header').textContent = '不正解…';
+    addWrong(q.id);
+    sessionWrongIds.push(q.id);
+  }
+
+  document.getElementById('result-explanation').textContent = q.explanation;
+
+  const btnNext = document.getElementById('btn-next');
+  btnNext.style.display = 'block';
+
+  if (currentIndex + 1 >= currentQuestions.length) {
+    btnNext.textContent = '結果を見る';
+  } else {
+    btnNext.textContent = '次の問題へ →';
+  }
+}
+
+function nextQuestion() {
+  currentIndex++;
+  if (currentIndex >= currentQuestions.length) {
+    showFinalResult();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showFinalResult() {
+  document.getElementById('quiz-screen').style.display = 'none';
+  document.getElementById('result-screen').style.display = 'block';
+
+  const total = currentQuestions.length;
+  const wrong = total - correctCount;
+  const pct = Math.round((correctCount / total) * 100);
+
+  document.getElementById('final-score').textContent = `${correctCount}/${total}`;
+  document.getElementById('bd-correct').textContent = correctCount;
+  document.getElementById('bd-wrong').textContent = wrong;
+
+  let msg, sub;
+  if (pct >= 80) { msg = '素晴らしい！🎉'; sub = '合格ラインを超えています。この調子で！'; }
+  else if (pct >= 60) { msg = 'もう少し！💪'; sub = `${wrong}問を苦手リストに追加しました。復習しましょう。`; }
+  else { msg = '要復習📚'; sub = `苦手問題をしっかり復習して再挑戦！`; }
+
+  document.getElementById('final-msg').textContent = msg;
+  document.getElementById('final-sub').textContent = sub;
+
+  updateStats();
+}
+
+function endQuiz() {
+  if (confirm('問題を終了しますか？（回答済みの内容は記録されます）')) {
+    showStartScreen();
+  }
+}
+
+// =====================================================
+// 苦手問題リスト
+// =====================================================
+function renderWeakList() {
+  const weakData = getWeakData();
+  const weakIds = Object.keys(weakData).map(Number);
+  const weakQuestions = ALL_QUESTIONS.filter(q => weakIds.includes(q.id))
+    .sort((a, b) => (weakData[b.id] || 0) - (weakData[a.id] || 0));
+
+  const wrap = document.getElementById('weak-list-wrap');
+
+  if (weakQuestions.length === 0) {
+    wrap.innerHTML = `
+      <div class="empty-state">
+        <div class="emoji">🎯</div>
+        <p>苦手問題はまだありません！<br>問題を解くと、間違えた問題が<br>ここに自動で記録されます。</p>
+      </div>`;
+    return;
+  }
+
+  wrap.innerHTML = `
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:10px;">
+      ${weakQuestions.length}問の苦手問題が記録されています
+    </div>
+    <div class="weak-list">
+      ${weakQuestions.map(q => `
+        <div class="weak-card">
+          <div class="weak-card-header">
+            <span class="subject-badge ${q.subjectClass}">${q.subject}</span>
+            <span class="weak-miss">${weakData[q.id]}回ミス</span>
+          </div>
+          <div class="weak-q">${q.question}</div>
+        </div>
+      `).join('')}
+    </div>
+    <button class="btn-secondary" style="margin-top:14px;" onclick="clearAllWeak()">🗑️ 苦手リストをリセット</button>
+  `;
+}
+
+function clearAllWeak() {
+  if (confirm('苦手リストをすべてリセットしますか？')) {
+    localStorage.removeItem(STORAGE_KEY);
+    renderWeakList();
+    updateStats();
+  }
+}
+
+// =====================================================
+// 初期化
+// =====================================================
+updateStats();
+</script>
+</body>
+</html>
