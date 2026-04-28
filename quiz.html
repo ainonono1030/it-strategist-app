@@ -417,6 +417,127 @@
     display: inline-block;
     margin-bottom: 6px;
   }
+
+  /* ===== 続きから始めるバナー ===== */
+  .resume-banner {
+    background: linear-gradient(135deg, #fffbeb, #fef3c7);
+    border: 2px solid #f59e0b;
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 14px;
+    display: none;
+  }
+  .resume-banner-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: #92400e;
+    margin-bottom: 4px;
+  }
+  .resume-banner-info {
+    font-size: 14px;
+    color: #78350f;
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+  .resume-btns { display: flex; gap: 8px; }
+  .btn-resume {
+    flex: 1;
+    padding: 11px;
+    background: #f59e0b;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .btn-resume-cancel {
+    padding: 11px 14px;
+    background: var(--surface);
+    color: var(--text-muted);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* ===== 年度・試験区分フィルター ===== */
+  .filter-section { margin-bottom: 14px; }
+  .filter-label {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .filter-chip {
+    padding: 7px 13px;
+    border: 2px solid var(--border);
+    border-radius: 20px;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .filter-chip.active {
+    border-color: var(--accent);
+    background: #ede9fe;
+    color: var(--accent);
+  }
+  .filter-chip:active { transform: scale(0.96); }
+  .filter-exam-row { display: flex; gap: 8px; margin-top: 6px; }
+  .filter-exam-btn {
+    flex: 1;
+    padding: 9px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+  .filter-exam-btn.active {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    color: var(--primary);
+  }
+  .filter-result-note {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    padding: 6px 10px;
+    background: #f8fafc;
+    border-radius: 8px;
+    display: none;
+  }
+
+  /* ===== 一時停止ボタン ===== */
+  .btn-pause {
+    width: 100%;
+    padding: 13px;
+    background: var(--surface);
+    color: var(--warning);
+    border: 2px solid var(--warning);
+    border-radius: var(--radius);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+  }
+  .btn-pause:active { transform: scale(0.98); }
 </style>
 </head>
 <body>
@@ -442,6 +563,17 @@
 
     <!-- スタート画面 -->
     <div id="start-screen">
+
+      <!-- 続きから始めるバナー -->
+      <div class="resume-banner" id="resume-banner">
+        <div class="resume-banner-title">⏸️ 前回の続きがあります</div>
+        <div class="resume-banner-info" id="resume-info"></div>
+        <div class="resume-btns">
+          <button class="btn-resume" onclick="resumeQuiz()">▶️ 続きから始める</button>
+          <button class="btn-resume-cancel" onclick="clearPause()">✕ 破棄</button>
+        </div>
+      </div>
+
       <div class="stats-card">
         <div class="stat-item">
           <div class="stat-num" id="total-count">0</div>
@@ -470,8 +602,23 @@
         </div>
       </div>
 
+      <!-- 年度・試験区分フィルター -->
+      <div class="filter-section">
+        <div class="filter-label">📅 年度フィルター</div>
+        <div class="filter-row" id="year-chips">
+          <!-- JS で動的生成 -->
+        </div>
+        <div class="filter-label" style="margin-top:10px;">📋 試験区分</div>
+        <div class="filter-exam-row">
+          <button class="filter-exam-btn active" id="exam-all" onclick="setExam('all', this)">全て</button>
+          <button class="filter-exam-btn" id="exam-1" onclick="setExam('午前Ⅰ', this)">午前Ⅰ</button>
+          <button class="filter-exam-btn" id="exam-2" onclick="setExam('午前Ⅱ', this)">午前Ⅱ</button>
+        </div>
+        <div class="filter-result-note" id="filter-note"></div>
+      </div>
+
       <div style="display:flex; gap:8px; margin-bottom:8px;">
-        <button class="btn-primary" style="margin-top:0;" onclick="startQuiz('all')">🔀 全問ランダム</button>
+        <button class="btn-primary" style="margin-top:0;" onclick="startQuiz('all')">🔀 ランダム出題</button>
       </div>
       <button class="btn-secondary" onclick="startQuiz('weak')" id="btn-weak-start">⚠️ 苦手問題だけ</button>
 
@@ -513,6 +660,7 @@
 
       <button class="btn-primary" id="btn-next" style="display:none;" onclick="nextQuestion()">次の問題へ →</button>
       <button class="btn-secondary" onclick="endQuiz()" style="margin-top:8px;">終了する</button>
+      <button class="btn-pause" onclick="pauseQuiz()">⏸️ 一時停止して保存</button>
     </div>
 
     <!-- 結果画面 -->
@@ -2066,7 +2214,10 @@ let correctCount = 0;
 let wrongIds = [];
 let sessionWrongIds = [];
 let selectedCount = 10; // 出題数（0 = 全問）
+let selectedYear = 'all';
+let selectedExam = 'all';
 const STORAGE_KEY = 'its_weak_questions';
+const PAUSE_KEY = 'its_pause_state';
 
 function getWeakData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; }
@@ -2123,6 +2274,190 @@ function showStartScreen() {
   document.getElementById('quiz-screen').style.display = 'none';
   document.getElementById('result-screen').style.display = 'none';
   updateStats();
+  buildYearChips();
+  checkResumeBanner();
+}
+
+// =====================================================
+// 年度・試験区分フィルター
+// =====================================================
+function buildYearChips() {
+  const years = new Set();
+  ALL_QUESTIONS.forEach(q => {
+    if (q.source) {
+      const m = q.source.match(/^(R\d+|H\d+)/);
+      if (m) years.add(m[1]);
+    }
+  });
+
+  // 降順ソート（Rは令和、Hは平成）
+  const sorted = Array.from(years).sort((a, b) => {
+    const toNum = s => {
+      const n = parseInt(s.slice(1));
+      return s[0] === 'R' ? 100 + n : n;
+    };
+    return toNum(b) - toNum(a);
+  });
+
+  const container = document.getElementById('year-chips');
+  container.innerHTML = '';
+
+  // 「全て」チップ
+  const allChip = document.createElement('button');
+  allChip.className = 'filter-chip' + (selectedYear === 'all' ? ' active' : '');
+  allChip.textContent = '全て';
+  allChip.onclick = () => setYear('all', allChip);
+  container.appendChild(allChip);
+
+  sorted.forEach(y => {
+    const chip = document.createElement('button');
+    const label = y[0] === 'R' ? `令和${y.slice(1)}年` : `平成${y.slice(1)}年`;
+    chip.className = 'filter-chip' + (selectedYear === y ? ' active' : '');
+    chip.textContent = label;
+    chip.dataset.year = y;
+    chip.onclick = () => setYear(y, chip);
+    container.appendChild(chip);
+  });
+
+  updateFilterNote();
+}
+
+function setYear(year, btn) {
+  selectedYear = year;
+  document.querySelectorAll('#year-chips .filter-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  updateFilterNote();
+}
+
+function setExam(exam, btn) {
+  selectedExam = exam;
+  document.querySelectorAll('.filter-exam-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  updateFilterNote();
+}
+
+function getFilteredPool(mode) {
+  let pool = ALL_QUESTIONS;
+
+  if (selectedYear !== 'all') {
+    pool = pool.filter(q => q.source && q.source.startsWith(selectedYear));
+  }
+  if (selectedExam !== 'all') {
+    pool = pool.filter(q => q.source && q.source.includes(selectedExam));
+  }
+
+  if (mode === 'weak') {
+    const weakIds = Object.keys(getWeakData()).map(Number);
+    pool = pool.filter(q => weakIds.includes(q.id));
+  }
+
+  return shuffle(pool);
+}
+
+function updateFilterNote() {
+  let pool = ALL_QUESTIONS;
+  if (selectedYear !== 'all') {
+    pool = pool.filter(q => q.source && q.source.startsWith(selectedYear));
+  }
+  if (selectedExam !== 'all') {
+    pool = pool.filter(q => q.source && q.source.includes(selectedExam));
+  }
+
+  const note = document.getElementById('filter-note');
+  if (selectedYear === 'all' && selectedExam === 'all') {
+    note.style.display = 'none';
+  } else {
+    note.style.display = 'block';
+    note.textContent = `📌 フィルター適用中：${pool.length}問が対象`;
+  }
+}
+
+// =====================================================
+// 一時停止 / 再開
+// =====================================================
+function pauseQuiz() {
+  const state = {
+    questionIds: currentQuestions.map(q => q.id),
+    index: currentIndex,
+    correctCount: correctCount,
+    sessionWrongIds: sessionWrongIds,
+    selectedCount: selectedCount,
+    selectedYear: selectedYear,
+    selectedExam: selectedExam,
+    timestamp: Date.now()
+  };
+  try {
+    localStorage.setItem(PAUSE_KEY, JSON.stringify(state));
+  } catch (e) {}
+  showStartScreen();
+}
+
+function resumeQuiz() {
+  let state;
+  try {
+    state = JSON.parse(localStorage.getItem(PAUSE_KEY));
+  } catch { state = null; }
+  if (!state) return;
+
+  // IDリストから問題オブジェクトを復元（順序を保持）
+  const idMap = {};
+  ALL_QUESTIONS.forEach(q => { idMap[q.id] = q; });
+  const restored = state.questionIds.map(id => idMap[id]).filter(Boolean);
+  if (restored.length === 0) { clearPause(); return; }
+
+  currentQuestions = restored;
+  currentIndex = state.index;
+  correctCount = state.correctCount;
+  sessionWrongIds = state.sessionWrongIds || [];
+  selectedCount = state.selectedCount || 10;
+  selectedYear = state.selectedYear || 'all';
+  selectedExam = state.selectedExam || 'all';
+
+  // 保存データを消去（再開したので）
+  localStorage.removeItem(PAUSE_KEY);
+
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('result-screen').style.display = 'none';
+  document.getElementById('quiz-screen').style.display = 'block';
+
+  renderQuestion();
+}
+
+function clearPause() {
+  localStorage.removeItem(PAUSE_KEY);
+  document.getElementById('resume-banner').style.display = 'none';
+}
+
+function checkResumeBanner() {
+  let state;
+  try {
+    state = JSON.parse(localStorage.getItem(PAUSE_KEY));
+  } catch { state = null; }
+
+  const banner = document.getElementById('resume-banner');
+  if (!state || !state.questionIds) {
+    banner.style.display = 'none';
+    return;
+  }
+
+  const total = state.questionIds.length;
+  const current = state.index + 1;
+  const d = new Date(state.timestamp);
+  const dateStr = `${d.getMonth() + 1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+  let filterDesc = '';
+  if (state.selectedYear && state.selectedYear !== 'all') {
+    const y = state.selectedYear;
+    filterDesc += (y[0] === 'R' ? `令和${y.slice(1)}年` : `平成${y.slice(1)}年`);
+  }
+  if (state.selectedExam && state.selectedExam !== 'all') {
+    filterDesc += (filterDesc ? '・' : '') + state.selectedExam;
+  }
+
+  document.getElementById('resume-info').textContent =
+    `${dateStr} 保存 ／ ${total}問中 ${current}問目（正解 ${state.correctCount}問）` +
+    (filterDesc ? ` ／ ${filterDesc}` : '');
+
+  banner.style.display = 'block';
 }
 
 function updateStats() {
@@ -2149,18 +2484,15 @@ function updateStats() {
 // クイズ制御
 // =====================================================
 function startQuiz(mode) {
-  const weakData = getWeakData();
-  const weakIds = Object.keys(weakData).map(Number);
-  let pool;
+  let pool = getFilteredPool(mode);
 
-  if (mode === 'weak') {
-    pool = shuffle(ALL_QUESTIONS.filter(q => weakIds.includes(q.id)));
-    if (pool.length === 0) {
+  if (pool.length === 0) {
+    if (mode === 'weak') {
       alert('苦手問題がまだ登録されていません！');
-      return;
+    } else {
+      alert('選択したフィルターに該当する問題がありません。');
     }
-  } else {
-    pool = shuffle(ALL_QUESTIONS);
+    return;
   }
 
   // 出題数を適用（0 = 全問、それ以外は先頭N問）
@@ -2359,6 +2691,8 @@ function clearAllWeak() {
 // 初期化
 // =====================================================
 updateStats();
+buildYearChips();
+checkResumeBanner();
 </script>
 </body>
 </html>
